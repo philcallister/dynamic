@@ -28,7 +28,7 @@ defmodule Dynamic.Multi.One do
 
   @impl true
   def handle_call(:toast, _from, state) do
-    IO.puts("ONE: #{state[:state]}")
+    IO.puts("\"ONE: #{state[:state]}\"")
     {:reply, :ok, state}
   end
 

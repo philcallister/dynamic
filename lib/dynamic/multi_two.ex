@@ -28,7 +28,7 @@ defmodule Dynamic.Multi.Two do
 
   @impl true
   def handle_call(:toast, _from, state) do
-    IO.puts("TWO: #{state[:state]}")
+    IO.puts("\"TWO: #{state[:state]}\"")
     {:reply, :ok, state}
   end
 
