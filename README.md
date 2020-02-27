@@ -1,21 +1,32 @@
-# Dynamic
+# Dynamic - Supervision with "Fake" Polymorphism
 
-**TODO: Add description**
+  This is just a simple attempt to create dynamically supervised children which can be called in a "fake" polymorphic way. There might be much better ways to do this, so if there is, let me know!
 
-## Installation
+  For this example, the idea is that different **types** of children could be supervised together, then called polymorphically, without knowing anything about the actual child.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `dynamic` to your list of dependencies in `mix.exs`:
+  To do this, a child is started through the supervisor. When the child initializes, it registers itself and its `__MODULE__` within the `Registry`. After it's started, it can be invoked through a proxy, by the same supervisor that started it.
 
-```elixir
-def deps do
-  [
-    {:dynamic, "~> 0.1.0"}
-  ]
-end
+### Installation
+```sh
+$ mix deps.get
+$ mix deps.compile
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/dynamic](https://hexdocs.pm/dynamic).
-
+### Run It
+Once you've got all the dependencies pulled, start it up within `iex` so you can start some child processes
+```sh
+iex -S mix run
+```
+Now that you're within `iex`, you can start some children. Try the following
+```elixir
+iex(1)> Dynamic.Multi.Supervisor.start_child_one("phil", "This is state")
+{:ok, #PID<0.175.0>}
+iex(2)> Dynamic.Multi.Supervisor.start_child_two("amy", "This is state too")
+{:ok, #PID<0.178.0>}
+iex(3)> Dynamic.Multi.Supervisor.toast("phil")
+"ONE: This is state"
+:ok
+iex(3)> Dynamic.Multi.Supervisor.toast("amy")
+"TWO: This is state too"
+:ok
+```
+That's about it. You're starting two children of different types. When you call `toast/1` with the child's name, it invokes the proxy within the supervisor. The proxy then looks up the child within the `Registry` and calls the child's `toast/1` function. Done!
