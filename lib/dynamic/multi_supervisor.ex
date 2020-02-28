@@ -35,43 +35,34 @@ defmodule Dynamic.Multi.Supervisor do
   end
 
   @doc """
-  Start a child process ONE with the given `name` and `state`
+  Start a child process with the given `module`, `name`, and `state`
 
-  Returns `{:ok, pid()}` | `{:error, {:already_started, pid()}}`
-
-  ## Examples
-
-    iex> Dynamic.Multi.Supervisor.start_child_one("phil", "This is state")
-    {:ok, pid()}
-
-  """
-  def start_child_one(name, state) do
-    spec = %{
-      id: Dynamic.Multi.One,
-      start: {Dynamic.Multi.One, :start_link, [%{state: state, name: name}]}
-    }
-
-    DynamicSupervisor.start_child(__MODULE__, spec)
-  end
-
-  @doc """
-  Start a child process TWO with the given `name` and `state`
-
-  Returns `{:ok, pid()}` | `{:error, {:already_started, pid()}}`
+  Returns `{:ok, pid()}` | `{:error, String.t}` | `{:error, {:already_started, pid()}}`
 
   ## Examples
 
-    iex> Dynamic.Multi.Supervisor.start_child_two("amy", "This is state")
+    iex> Dynamic.Multi.Supervisor.start_child(
+           Dynamic.Multi.One, "phil", "This is state")
     {:ok, pid()}
 
-  """
-  def start_child_two(name, state) do
-    spec = %{
-      id: Dynamic.Multi.Two,
-      start: {Dynamic.Multi.Two, :start_link, [%{state: state, name: name}]}
-    }
+    iex> Dynamic.Multi.Supervisor.start_child(
+           Dynamic.Multi.Nope, "amy", "This is state too")
+    {:error, String.t}
 
-    DynamicSupervisor.start_child(__MODULE__, spec)
+  """
+  def start_child(module, name, state) do
+    case implemented_by?(module) do
+      true ->
+        spec = %{
+          id: module,
+          start: {module, :start_link, [%{state: state, name: name}]}
+        }
+
+        DynamicSupervisor.start_child(__MODULE__, spec)
+
+      _ ->
+        {:error, "Module '#{module}' doesn't implement 'Dynamic.Multi' behaviour"}
+    end
   end
 
   # Server
@@ -79,5 +70,15 @@ defmodule Dynamic.Multi.Supervisor do
   @impl true
   def init(state) do
     {:ok, state}
+  end
+
+  # Private
+
+  # Check to see if the given module actually implements the behaviour as
+  # defined within the Dynamic.Multi module.
+  defp implemented_by?(module) do
+    :attributes
+    |> module.module_info()
+    |> Enum.member?({:behaviour, [Dynamic.Multi]})
   end
 end
