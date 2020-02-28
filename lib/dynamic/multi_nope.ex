@@ -23,9 +23,6 @@ defmodule Dynamic.Multi.Nope do
   ## Private
 
   defp via_tuple(name) do
-    # Adding the __MODULE__ here as the value, so it can be retrieved within
-    # the Dynamic.Multi.Supervisor.toast function when the Registry
-    # lookup is perfomed. This will provide the "fake" polymorphism.
     {:via, Registry, {Dynamic.Multi.Registry, name, __MODULE__}}
   end
 end
