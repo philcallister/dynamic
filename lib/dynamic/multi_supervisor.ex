@@ -23,8 +23,9 @@ defmodule Dynamic.Multi.Supervisor do
 
   ## Examples
 
-    iex> Dynamic.Multi.Supervisor.toast("phil")
-    :ok
+      iex> Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.One, "phil", "This is state")
+      ...> Dynamic.Multi.Supervisor.toast("phil")
+      :ok
 
   """
   def toast(name) do
@@ -41,13 +42,11 @@ defmodule Dynamic.Multi.Supervisor do
 
   ## Examples
 
-    iex> Dynamic.Multi.Supervisor.start_child(
-           Dynamic.Multi.One, "phil", "This is state")
-    {:ok, pid()}
+      iex> result = Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.One, "phil", "This is state")
+      ...> with {:ok, _pid} <- result, do: :passed
 
-    iex> Dynamic.Multi.Supervisor.start_child(
-           Dynamic.Multi.Nope, "amy", "This is state too")
-    {:error, String.t}
+      iex> result = Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.Nope, "amy", "This is state too")
+      ...> with {:error, _string} <- result, do: :passed
 
   """
   def start_child(module, name, state) do
