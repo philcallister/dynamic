@@ -45,7 +45,7 @@ defmodule Dynamic.Multi.Supervisor do
       iex> result = Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.One, "phil", "This is state")
       ...> with {:ok, _pid} <- result, do: :passed
 
-      iex> result = Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.Nope, "amy", "This is state too")
+      iex> result = Dynamic.Multi.Supervisor.start_child(Dynamic.Multi.Nope, "ooops", "This fails")
       ...> with {:error, _string} <- result, do: :passed
 
   """
